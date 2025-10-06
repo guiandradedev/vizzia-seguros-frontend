@@ -134,31 +134,23 @@ function FaqPage() {
       ) : (
         <ul className="space-y-4">
           {faqs.map(faq => (
-            <li
-              key={faq.id}
-              className="border rounded p-4 flex justify-between items-start"
-            >
-              <div>
-                <p className="font-semibold text-gray-800">{faq.question}</p>
-                <p className="text-gray-600">{faq.answer}</p>
+            <li key={faq.id} className="border rounded p-4">
+              <div className="max-w-full">
+                <p className="font-semibold text-gray-800 break-words">{faq.question}</p>
+                <p className="text-gray-600 break-words">{faq.answer}</p>
               </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleEdit(faq)}
-                  className="text-blue-600 hover:underline"
-                >
+              <div className="flex gap-3 mt-2">
+                <button onClick={() => handleEdit(faq)} className="text-blue-600 hover:underline">
                   Editar
                 </button>
-                <button
-                  onClick={() => handleDelete(faq.id)}
-                  className="text-red-600 hover:underline"
-                >
+                <button onClick={() => handleDelete(faq.id)} className="text-red-600 hover:underline">
                   Excluir
                 </button>
               </div>
             </li>
           ))}
         </ul>
+
       )}
     </div>
   )
