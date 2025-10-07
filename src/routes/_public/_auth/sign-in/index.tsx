@@ -5,7 +5,10 @@ import { Form, FormItem, FormLabel, FormControl, FormMessage } from "@/component
 import { Button } from "@/components/ui/button";
 // import GoogleAuth from "../google-auth";
 
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import { GoogleAuth } from "../_components/GoogleAuth";
+import axios from "axios";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute('/_public/_auth/sign-in/')({
   component: RouteComponent,
@@ -13,32 +16,54 @@ export const Route = createFileRoute('/_public/_auth/sign-in/')({
 
 const signupSchema = z
   .object({
-    name: z.string().nonempty("Nome é obrigatório"),
     email: z.string().email("Email inválido").nonempty("Email é obrigatório"),
-    phone: z.string().min(10, "Telefone inválido").nonempty("Telefone é obrigatório"),
-    password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
-    confirmPassword: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+    password: z.string().nonempty("Senha é obrigatório"),
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "As senhas não coincidem",
-    path: ["confirmPassword"], // Path to show the error under confirmPassword field
-  });
 
 type SignUpFormInputs = z.infer<typeof signupSchema>;
 
 function RouteComponent() {
+  const { login } = useAuth()
   const form = useForm<SignUpFormInputs>({
     resolver: zodResolver(signupSchema), // Usa o Zod para validação
     defaultValues: {
-      name: "",
       email: "",
-      phone: "",
       password: "",
-      confirmPassword: "",
     },
   });
 
-  const onSubmit = (data: SignUpFormInputs) => {
+  const onSubmit = async (data: SignUpFormInputs) => {
+    if (!data.email || !data.password) {
+      alert("Preencha todos os campos")
+      return
+    }
+    try {
+      login(data.email, data.password)
+
+      const params = new URLSearchParams(window.location.search)
+      const redirect_url = params.get('redirect')
+
+      if (redirect_url) {
+        try {
+          // normaliza e valida origem (protege contra open redirect)
+          const target = new URL(redirect_url, window.location.origin)
+          if (target.origin === window.location.origin) {
+            // navega cliente-side preservando search/hash
+            redirect({ to: target.pathname + target.search + target.hash })
+            return
+          }
+        } catch (e) {
+          // URL inválida => ignora e segue para dashboard
+        }
+      }
+
+      // sem redirect válido, vai para o dashboard
+      redirect({ to: '/dashboard' })
+
+    } catch (error) {
+      alert("Erro ao logar")
+    }
+
     console.log(data); // Substitua por lógica de cadastro
   };
 
@@ -47,12 +72,12 @@ function RouteComponent() {
       {/* Hero Section */}
       <div className="hidden md:flex flex-1 items-center justify-center py-8 px-4">
         <img
-              src="/login.svg"
-              alt="Signup Illustration"
-              width={400}
-              height={400}
-              className="dark:invert"
-          />
+          src="/login.svg"
+          alt="Signup Illustration"
+          width={400}
+          height={400}
+          className="dark:invert"
+        />
       </div>
 
       {/* Signup Section */}
@@ -60,22 +85,6 @@ function RouteComponent() {
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Crie sua conta</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
-            {/* Name Input */}
-            <FormItem>
-              <FormLabel htmlFor="name">Nome</FormLabel>
-              <FormControl>
-                <input
-                  type="text"
-                  id="name"
-                  placeholder="Digite seu nome"
-                  {...form.register("name")}
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </FormControl>
-              <FormMessage>
-                {form.formState.errors.name?.message}
-              </FormMessage>
-            </FormItem>
 
             {/* Email Input */}
             <FormItem>
@@ -91,23 +100,6 @@ function RouteComponent() {
               </FormControl>
               <FormMessage>
                 {form.formState.errors.email?.message}
-              </FormMessage>
-            </FormItem>
-
-            {/* Phone Input */}
-            <FormItem>
-              <FormLabel htmlFor="phone">Telefone</FormLabel>
-              <FormControl>
-                <input
-                  type="tel"
-                  id="phone"
-                  placeholder="Digite seu telefone"
-                  {...form.register("phone")}
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </FormControl>
-              <FormMessage>
-                {form.formState.errors.phone?.message}
               </FormMessage>
             </FormItem>
 
@@ -128,23 +120,6 @@ function RouteComponent() {
               </FormMessage>
             </FormItem>
 
-            {/* Confirm Password Input */}
-            <FormItem>
-              <FormLabel htmlFor="confirmPassword">Confirme sua senha</FormLabel>
-              <FormControl>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  placeholder="Confirme sua senha"
-                  {...form.register("confirmPassword")}
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </FormControl>
-              <FormMessage>
-                {form.formState.errors.confirmPassword?.message}
-              </FormMessage>
-            </FormItem>
-
             {/* Submit Button */}
             <Button type="submit" className="w-full">
               Cadastrar
@@ -153,10 +128,9 @@ function RouteComponent() {
         </Form>
 
         <div className="w-full mt-6">
-          {/* <GoogleAuth /> */}
+          <GoogleAuth />
         </div>
 
-        {/* Login Link */}
         <p className="mt-4 text-sm text-gray-600">
           Já tem uma conta?{" "}
           <a href="/login" className="text-indigo-600 hover:underline">

@@ -13,6 +13,7 @@ import { Route as PublicLayoutRouteImport } from './routes/_public/layout'
 import { Route as PrivateLayoutRouteImport } from './routes/_private/layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PublicAuthLayoutRouteImport } from './routes/_public/_auth/layout'
+import { Route as PrivateDashboardIndexRouteImport } from './routes/_private/dashboard/index'
 import { Route as PublicAuthSignUpIndexRouteImport } from './routes/_public/_auth/sign-up/index'
 import { Route as PublicAuthSignInIndexRouteImport } from './routes/_public/_auth/sign-in/index'
 import { Route as PublicAuthForgotIndexRouteImport } from './routes/_public/_auth/forgot/index'
@@ -35,6 +36,11 @@ const IndexRoute = IndexRouteImport.update({
 const PublicAuthLayoutRoute = PublicAuthLayoutRouteImport.update({
   id: '/_auth',
   getParentRoute: () => PublicLayoutRoute,
+} as any)
+const PrivateDashboardIndexRoute = PrivateDashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => PrivateLayoutRoute,
 } as any)
 const PublicAuthSignUpIndexRoute = PublicAuthSignUpIndexRouteImport.update({
   id: '/sign-up/',
@@ -65,6 +71,7 @@ const PublicAuthComponentsGoogleAuthRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof PrivateDashboardIndexRoute
   '/GoogleAuth': typeof PublicAuthComponentsGoogleAuthRoute
   '/activate': typeof PublicAuthActivateIndexRoute
   '/forgot': typeof PublicAuthForgotIndexRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof PrivateDashboardIndexRoute
   '/GoogleAuth': typeof PublicAuthComponentsGoogleAuthRoute
   '/activate': typeof PublicAuthActivateIndexRoute
   '/forgot': typeof PublicAuthForgotIndexRoute
@@ -82,9 +90,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_private': typeof PrivateLayoutRoute
+  '/_private': typeof PrivateLayoutRouteWithChildren
   '/_public': typeof PublicLayoutRouteWithChildren
   '/_public/_auth': typeof PublicAuthLayoutRouteWithChildren
+  '/_private/dashboard/': typeof PrivateDashboardIndexRoute
   '/_public/_auth/_components/GoogleAuth': typeof PublicAuthComponentsGoogleAuthRoute
   '/_public/_auth/activate/': typeof PublicAuthActivateIndexRoute
   '/_public/_auth/forgot/': typeof PublicAuthForgotIndexRoute
@@ -95,19 +104,28 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
     | '/GoogleAuth'
     | '/activate'
     | '/forgot'
     | '/sign-in'
     | '/sign-up'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/GoogleAuth' | '/activate' | '/forgot' | '/sign-in' | '/sign-up'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/GoogleAuth'
+    | '/activate'
+    | '/forgot'
+    | '/sign-in'
+    | '/sign-up'
   id:
     | '__root__'
     | '/'
     | '/_private'
     | '/_public'
     | '/_public/_auth'
+    | '/_private/dashboard/'
     | '/_public/_auth/_components/GoogleAuth'
     | '/_public/_auth/activate/'
     | '/_public/_auth/forgot/'
@@ -117,7 +135,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PrivateLayoutRoute: typeof PrivateLayoutRoute
+  PrivateLayoutRoute: typeof PrivateLayoutRouteWithChildren
   PublicLayoutRoute: typeof PublicLayoutRouteWithChildren
 }
 
@@ -150,6 +168,13 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof PublicAuthLayoutRouteImport
       parentRoute: typeof PublicLayoutRoute
+    }
+    '/_private/dashboard/': {
+      id: '/_private/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof PrivateDashboardIndexRouteImport
+      parentRoute: typeof PrivateLayoutRoute
     }
     '/_public/_auth/sign-up/': {
       id: '/_public/_auth/sign-up/'
@@ -189,6 +214,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface PrivateLayoutRouteChildren {
+  PrivateDashboardIndexRoute: typeof PrivateDashboardIndexRoute
+}
+
+const PrivateLayoutRouteChildren: PrivateLayoutRouteChildren = {
+  PrivateDashboardIndexRoute: PrivateDashboardIndexRoute,
+}
+
+const PrivateLayoutRouteWithChildren = PrivateLayoutRoute._addFileChildren(
+  PrivateLayoutRouteChildren,
+)
+
 interface PublicAuthLayoutRouteChildren {
   PublicAuthComponentsGoogleAuthRoute: typeof PublicAuthComponentsGoogleAuthRoute
   PublicAuthActivateIndexRoute: typeof PublicAuthActivateIndexRoute
@@ -222,7 +259,7 @@ const PublicLayoutRouteWithChildren = PublicLayoutRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PrivateLayoutRoute: PrivateLayoutRoute,
+  PrivateLayoutRoute: PrivateLayoutRouteWithChildren,
   PublicLayoutRoute: PublicLayoutRouteWithChildren,
 }
 export const routeTree = rootRouteImport

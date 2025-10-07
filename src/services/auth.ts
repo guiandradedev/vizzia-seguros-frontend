@@ -1,18 +1,21 @@
 // src/services/authService.js
-export const TOKEN_KEY = "@rocketseat-token";
+export const KEY = "@flaamer";
+export const ACCESS_TOKEN_KEY = `${KEY}-access-token`;
+export const REFRESH_TOKEN_KEY = `${KEY}-refresh-token`;
+
 
 // Verifica se já tem um token no localStorage (usuário logado)
-export const isAuthenticated = () => localStorage.getItem(TOKEN_KEY) !== null;
+export const isAuthenticated = () => localStorage.getItem(ACCESS_TOKEN_KEY) !== null;
 
 // Pega o token do localStorage
-export const getToken = () => localStorage.getItem(TOKEN_KEY);
+export const getToken = () => localStorage.getItem(ACCESS_TOKEN_KEY);
 
 // Salva o token (login)
 export const login = (token: string) => {
-  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(ACCESS_TOKEN_KEY, token);
 };
 
 // Remove o token (logout)
 export const logout = () => {
-  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
 };
