@@ -1,7 +1,7 @@
 import api from '@/lib/axios'
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, saveTokenLocal, logout as logoutService, saveTokenSession, getToken } from '@/services/auth'
 import type { ResponseAdapter } from '@/types/api'
-import type { UserAuthenticateResponse } from '@/types/auth'
+import type { UserToken } from '@/types/auth'
 import axios, { type AxiosResponse } from 'axios'
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { router } from '@/router'
@@ -9,14 +9,15 @@ import { router } from '@/router'
 export type TypeUserRoles = 'USER' | 'ADMIN'
 
 export interface User {
-  id?: string,
-  name: string,
-  email: string,
-  password?: string,
-  role: TypeUserRoles,
-  account_activate_at: Date | null,
-  createdAt: Date,
-  updatedAt: Date,
+  id: number;
+  name: string;
+  email: string;
+  cpf: string;
+  cnh: string;
+  expedition_cnh_date: number
+  phone_id: string;
+  birthday_date: Date;
+  status: boolean;
 }
 
 type LoginProps = {
@@ -47,11 +48,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsAuthenticated(true)
         setIsLoading(false)
         try {
-          const response: AxiosResponse<{ data: ResponseAdapter<User>}> = await api.get('/user/me')
-          setUser({
-            id: response.data.data.id,
-            ...response.data.data.attributes
-          })
+          const response: AxiosResponse<User> = await api.get('/users/me')
+          setUser(response.data)
         } catch (err) {
           console.log(err)
           logout()
@@ -73,11 +71,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
   }
 
-  function persistLogin(response: AxiosResponse<UserAuthenticateResponse>, remember: boolean) {
-    const accessToken = response.data.data.token.accessToken
-    const refreshToken = response.data.data.token.refreshToken
+  function persistLogin(response: AxiosResponse<UserToken>, remember: boolean) {
+    const accessToken = response.data.accessToken
+    const refreshToken = response.data.refreshToken
 
-    console.log(response.data.data)
+    console.log(response.data)
 
     setIsAuthenticated(true)
     if (remember) {
@@ -90,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const googleAuth = async (token: string) => {
     try {
-      const response: AxiosResponse<UserAuthenticateResponse> = await api.post('/auth/social-login', {
+      const response: AxiosResponse<UserToken> = await api.post('/auth/social-login', {
         token: token,
         provider: 'Google',
       })
@@ -106,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
   const login = async ({ email, password }: LoginProps, remember: boolean) => {
     try {
-      const response: AxiosResponse<UserAuthenticateResponse> = await api.post('/auth/login', {
+      const response: AxiosResponse<UserToken> = await api.post('/auth/login', {
         email: email,
         password: password
       })
