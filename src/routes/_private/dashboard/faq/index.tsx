@@ -84,6 +84,21 @@ function FaqPage() {
     setEditingId(faq.id)
   }
 
+  const handleActivate = async (faq: Faq) => {
+    try {
+      const updatedStatus = !faq.isActive // alterna o valor atual
+      await api.patch(`/faq/${faq.id}`, { isActive: updatedStatus }) // envia alteração para o backend
+
+      // Atualiza a lista localmente sem precisar recarregar tudo
+      setFaqs(prev =>
+        prev.map(f => (f.id === faq.id ? { ...f, isActive: updatedStatus } : f))
+      )
+    } catch (err) {
+      console.error('Erro ao atualizar status do FAQ:', err)
+    }
+
+  }
+
   // 🔹 Enum de categories — deve corresponder ao enum do NestJS
   const categories = ['assistência', 'pagamento', 'cobertura']
 
@@ -172,6 +187,12 @@ function FaqPage() {
                 </button>
                 <button onClick={() => handleDelete(faq.id)} className="text-red-600 hover:underline">
                   Excluir
+                </button>
+                <button onClick={() => handleActivate(faq)}
+                        className={`ml-auto font-bold text-white px-2 py-2 rounded-lg transition-transform duration-200 hover:scale-105 ${
+                        faq.isActive ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'
+                        }`}>
+                  {faq.isActive ? 'Ativado' : 'Desativado'}
                 </button>
               </div>
             </li>
