@@ -18,6 +18,7 @@ import { Route as PublicAuthSignUpIndexRouteImport } from './routes/_public/_aut
 import { Route as PublicAuthSignInIndexRouteImport } from './routes/_public/_auth/sign-in/index'
 import { Route as PublicAuthForgotIndexRouteImport } from './routes/_public/_auth/forgot/index'
 import { Route as PublicAuthActivateIndexRouteImport } from './routes/_public/_auth/activate/index'
+import { Route as PrivateDashboardInsuranceIndexRouteImport } from './routes/_private/dashboard/insurance/index'
 import { Route as PrivateDashboardFaqIndexRouteImport } from './routes/_private/dashboard/faq/index'
 import { Route as PublicAuthComponentsGoogleAuthRouteImport } from './routes/_public/_auth/_components/GoogleAuth'
 
@@ -63,6 +64,12 @@ const PublicAuthActivateIndexRoute = PublicAuthActivateIndexRouteImport.update({
   path: '/activate/',
   getParentRoute: () => PublicAuthLayoutRoute,
 } as any)
+const PrivateDashboardInsuranceIndexRoute =
+  PrivateDashboardInsuranceIndexRouteImport.update({
+    id: '/dashboard/insurance/',
+    path: '/dashboard/insurance/',
+    getParentRoute: () => PrivateLayoutRoute,
+  } as any)
 const PrivateDashboardFaqIndexRoute =
   PrivateDashboardFaqIndexRouteImport.update({
     id: '/dashboard/faq/',
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof PrivateDashboardIndexRoute
   '/GoogleAuth': typeof PublicAuthComponentsGoogleAuthRoute
   '/dashboard/faq': typeof PrivateDashboardFaqIndexRoute
+  '/dashboard/insurance': typeof PrivateDashboardInsuranceIndexRoute
   '/activate': typeof PublicAuthActivateIndexRoute
   '/forgot': typeof PublicAuthForgotIndexRoute
   '/sign-in': typeof PublicAuthSignInIndexRoute
@@ -91,6 +99,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof PrivateDashboardIndexRoute
   '/GoogleAuth': typeof PublicAuthComponentsGoogleAuthRoute
   '/dashboard/faq': typeof PrivateDashboardFaqIndexRoute
+  '/dashboard/insurance': typeof PrivateDashboardInsuranceIndexRoute
   '/activate': typeof PublicAuthActivateIndexRoute
   '/forgot': typeof PublicAuthForgotIndexRoute
   '/sign-in': typeof PublicAuthSignInIndexRoute
@@ -105,6 +114,7 @@ export interface FileRoutesById {
   '/_private/dashboard/': typeof PrivateDashboardIndexRoute
   '/_public/_auth/_components/GoogleAuth': typeof PublicAuthComponentsGoogleAuthRoute
   '/_private/dashboard/faq/': typeof PrivateDashboardFaqIndexRoute
+  '/_private/dashboard/insurance/': typeof PrivateDashboardInsuranceIndexRoute
   '/_public/_auth/activate/': typeof PublicAuthActivateIndexRoute
   '/_public/_auth/forgot/': typeof PublicAuthForgotIndexRoute
   '/_public/_auth/sign-in/': typeof PublicAuthSignInIndexRoute
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/GoogleAuth'
     | '/dashboard/faq'
+    | '/dashboard/insurance'
     | '/activate'
     | '/forgot'
     | '/sign-in'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/GoogleAuth'
     | '/dashboard/faq'
+    | '/dashboard/insurance'
     | '/activate'
     | '/forgot'
     | '/sign-in'
@@ -140,6 +152,7 @@ export interface FileRouteTypes {
     | '/_private/dashboard/'
     | '/_public/_auth/_components/GoogleAuth'
     | '/_private/dashboard/faq/'
+    | '/_private/dashboard/insurance/'
     | '/_public/_auth/activate/'
     | '/_public/_auth/forgot/'
     | '/_public/_auth/sign-in/'
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicAuthActivateIndexRouteImport
       parentRoute: typeof PublicAuthLayoutRoute
     }
+    '/_private/dashboard/insurance/': {
+      id: '/_private/dashboard/insurance/'
+      path: '/dashboard/insurance'
+      fullPath: '/dashboard/insurance'
+      preLoaderRoute: typeof PrivateDashboardInsuranceIndexRouteImport
+      parentRoute: typeof PrivateLayoutRoute
+    }
     '/_private/dashboard/faq/': {
       id: '/_private/dashboard/faq/'
       path: '/dashboard/faq'
@@ -237,11 +257,13 @@ declare module '@tanstack/react-router' {
 interface PrivateLayoutRouteChildren {
   PrivateDashboardIndexRoute: typeof PrivateDashboardIndexRoute
   PrivateDashboardFaqIndexRoute: typeof PrivateDashboardFaqIndexRoute
+  PrivateDashboardInsuranceIndexRoute: typeof PrivateDashboardInsuranceIndexRoute
 }
 
 const PrivateLayoutRouteChildren: PrivateLayoutRouteChildren = {
   PrivateDashboardIndexRoute: PrivateDashboardIndexRoute,
   PrivateDashboardFaqIndexRoute: PrivateDashboardFaqIndexRoute,
+  PrivateDashboardInsuranceIndexRoute: PrivateDashboardInsuranceIndexRoute,
 }
 
 const PrivateLayoutRouteWithChildren = PrivateLayoutRoute._addFileChildren(

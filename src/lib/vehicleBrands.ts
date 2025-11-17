@@ -1,0 +1,61 @@
+// Mapeamento de marcas de veículos (brand number -> nome)
+export const BRAND_MAP: Record<number, string> = {
+  1: 'Toyota',
+  2: 'Honda',
+  3: 'Ford',
+  4: 'Chevrolet',
+  5: 'Volkswagen',
+  6: 'BMW',
+  7: 'Mercedes-Benz',
+  8: 'Audi',
+  9: 'Nissan',
+  10: 'Hyundai',
+  11: 'Kia',
+  12: 'Fiat',
+  13: 'Renault',
+  14: 'Peugeot',
+  15: 'Citroën',
+  16: 'Volvo',
+  17: 'Jeep',
+  18: 'Land Rover',
+  19: 'Porsche',
+  20: 'Ferrari',
+  21: 'Lamborghini',
+  22: 'Maserati',
+  23: 'Jaguar',
+  24: 'Mini',
+  25: 'Smart',
+  26: 'Suzuki',
+  27: 'Mitsubishi',
+  28: 'Subaru',
+  29: 'Mazda',
+  30: 'Lexus',
+  31: 'Infiniti',
+  32: 'Acura',
+  33: 'Cadillac',
+  34: 'Lincoln',
+  35: 'Chrysler',
+  36: 'Dodge',
+  37: 'Ram',
+  38: 'GMC',
+  39: 'Buick',
+  40: 'Pontiac',
+  41: 'Oldsmobile',
+  42: 'Saturn',
+  43: 'Saab',
+  44: 'Scania',
+  45: 'Iveco',
+  46: 'MAN',
+  47: 'Mercedes-Benz (Caminhões)',
+  48: 'Volvo (Caminhões)',
+  49: 'DAF',
+  50: 'Renault Trucks',
+  // Adicione mais marcas conforme necessário
+};
+
+export const getBrandName = (brandId: number | undefined): string => {
+  if (!brandId || typeof brandId !== 'number') {
+    return 'Marca não informada';
+  }
+  return BRAND_MAP[brandId] || `Marca ${brandId}`;
+};
